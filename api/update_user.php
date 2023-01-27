@@ -51,7 +51,32 @@ if ($jwt) {
         if ($user->update()) {
 
             // сгенерировать заново JWT здесь
+            $token = array(
+                "iss" => $iss,
+                "aud" => $aud,
+                "iat" => $iat,
+                "nbf" => $nbf,
+                "data" => array(
+                    "id" => $user->id,
+                    "firstname" => $user->firstname,
+                    "lastname" => $user->lastname,
+                    "email" => $user->email,
+                ),
+            );
+
+            $jwt = JWT::encode($token, $key, 'HS256');
+
+            http_response_code(200);
+
+            // Ответ в формате JSON
+            echo json_encode(
+                array(
+                    "message" => "Пользователь был обновлен",
+                    "jwt" => $jwt,
+                )
+            );
         }
+
         // Сообщение, если не удается обновить пользователя
         else {
 
