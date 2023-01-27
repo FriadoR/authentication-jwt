@@ -188,7 +188,70 @@
           return false;
         });
 
-        // Показ домашней страницы
+        // Показать домашнюю страницу
+        $(document).on("click", "#home", () => {
+          showHomePage();
+          clearResponse();
+        });
+
+        // Функция для показа домашней страницы
+        function showHomePage() {
+          // Валидация JWT для проверки доступа
+          const jwt = getCookie("jwt");
+
+          $.post("api/validate_token.php", JSON.stringify({ jwt: jwt }))
+            .done((result) => {
+              // если прошел валидацию, показать домашнюю страницу
+              let html = `
+        <div class="card">
+            <div class="card-header">Добро пожаловать!</div>
+            <div class="card-body">
+                <h5 class="card-title">Вы вошли в систему</h5>
+                <p class="card-text">Вы не сможете получить доступ к домашней странице и страницам учетной записи, если вы не вошли в систему</p>
+            </div>
+        </div>
+    `;
+
+              $("#content").html(html);
+              showLoggedInMenu();
+            })
+
+            // Показать страницу входа при ошибке
+            .fail(function (result) {
+              showLoginPage();
+              $("#response").html(
+                "<div class='alert alert-danger'>Пожалуйста войдите, чтобы получить доступ к домашней станице</div>"
+              );
+            });
+        }
+
+        // Функция поможет нам прочитать JWT, который мы сохранили ранее.
+        function getCookie(cname) {
+          let name = cname + "=";
+          let decodedCookie = decodeURIComponent(document.cookie);
+          let ca = decodedCookie.split(";");
+          for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == " ") {
+              c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+            }
+          }
+          return "";
+        }
+
+        // Если пользователь авторизован
+        function showLoggedInMenu() {
+          // Скроем кнопки входа и регистрации с панели навигации и покажем кнопку выхода
+          $("#login, #sign_up").hide();
+          $("#logout").show();
+        }
+
+        // Здесь будет функция showUpdateAccountForm()
+
+        // Показать форму обновления аккаунта
 
         // Удаление всех быстрых сообщений
         function clearResponse() {
@@ -234,9 +297,44 @@
           return false;
         });
 
-        // Показ домашней страницы
+        // Показа формы входа
+        $(document).on("click", "#login", () => {
+          showLoginPage();
+        });
 
-        // SerializeObject будет здесь
+        // При отправке формы входа
+        $(document).on("submit", "#login_form", function () {
+          // Получаем данные формы
+          const login_form = $(this);
+          const form_data = JSON.stringify(login_form.serializeObject());
+
+          // Отправка данных формы в API
+          $.ajax({
+            url: "api/login.php",
+            type: "POST",
+            contentType: "application/json",
+            data: form_data,
+            success: (result) => {
+              // Сохраним JWT в куки
+              setCookie("jwt", result.jwt, 1);
+
+              // Показ домашней страницы и сообщение об успешном входе
+              showHomePage();
+              $("#response").html(
+                "<div class='alert alert-success'>Успешный вход в систему.</div>"
+              );
+            },
+            error: (xhr, resp, text) => {
+              // При ошибке сообщим пользователю, что вход в систему не выполнен и очистим поля ввода
+              $("#response").html(
+                "<div class='alert alert-danger'>Ошибка входа. Email или пароль указан неверно.</div>"
+              );
+              login_form.find("input").val("");
+            },
+          });
+
+          return false;
+        });
       });
     </script>
   </body>
