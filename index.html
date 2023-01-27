@@ -83,6 +83,54 @@
       crossorigin="anonymous"
     ></script>
 
-    <!-- Здесь будет jQuery код -->
+    <script>
+      jQuery(($) => {
+        // Показ формы регистрации
+        $(document).on("click", "#sign_up", () => {
+          let html = `
+                    <h2>Регистрация</h2>
+                    <form id="sign_up_form">
+                        <div class="form-group">
+                            <label for="firstname">Имя</label>
+                            <input type="text" class="form-control" name="firstname" id="firstname" required />
+                        </div>
+        
+                        <div class="form-group">
+                            <label for="lastname">Фамилия</label>
+                            <input type="text" class="form-control" name="lastname" id="lastname" required />
+                        </div>
+        
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" name="email" id="email" required />
+                        </div>
+        
+                        <div class="form-group">
+                            <label for="password">Пароль</label>
+                            <input type="password" class="form-control" name="password" id="password" required />
+                        </div>
+        
+                        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                    </form>
+                `;
+
+          clearResponse();
+          $("#content").html(html);
+        });
+
+        // Выполнение кода при отправке формы
+
+        // Показать форму входа при клике на кнопку
+
+        // Удаление всех быстрых сообщений
+        function clearResponse() {
+          $("#response").html("");
+        }
+
+        // Функция showLoginPage()
+
+        // SerializeObject будет здесь
+      });
+    </script>
   </body>
 </html>
