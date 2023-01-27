@@ -251,7 +251,70 @@
 
         // Здесь будет функция showUpdateAccountForm()
 
-        // Показать форму обновления аккаунта
+        $(document).on("click", "#update_account", () => {
+          showUpdateAccountForm();
+        });
+
+        // срабатывание при отправке формы «обновить аккаунт»
+        $(document).on("submit", "#update_account_form", function () {
+          // Дескриптор для update_account_form
+          const update_account_form = $(this);
+
+          // Валидация JWT для проверки доступа
+          const jwt = getCookie("jwt");
+
+          // Получаем данные формы
+          let update_account_form_obj = update_account_form.serializeObject();
+
+          // Добавим JWT
+          update_account_form_obj.jwt = jwt;
+
+          // Преобразуем значения формы в JSON с помощью функции stringify()
+          const form_data = JSON.stringify(update_account_form_obj);
+
+          // Отправка данных формы в API
+          $.ajax({
+            url: "api/update_user.php",
+            type: "POST",
+            contentType: "application/json",
+            data: form_data,
+            success: (result) => {
+              // Сказать, что учетная запись пользователя была обновлена
+              $("#response").html(
+                "<div class='alert alert-success'>Учетная запись обновлена</div>"
+              );
+
+              // Сохраняем новый JWT в cookie
+              setCookie("jwt", result.jwt, 1);
+            },
+
+            // Показать сообщение об ошибке пользователю
+            error: (xhr, resp, text) => {
+              if (
+                xhr.responseJSON.message == "Невозможно обновить пользователя"
+              ) {
+                $("#response").html(
+                  "<div class='alert alert-danger'>Невозможно обновить пользователя</div>"
+                );
+              } else if (xhr.responseJSON.message == "Доступ закрыт") {
+                showLoginPage();
+                $("#response").html(
+                  "<div class='alert alert-success'>Доступ закрыт. Пожалуйста войдите</div>"
+                );
+              }
+            },
+          });
+
+          return false;
+        });
+
+        // Выйти из системы
+        $(document).on("click", "#logout", () => {
+          showLoginPage();
+          $("#response").html(
+            "<div class='alert alert-info'>Вы вышли из системы.</div>"
+          );
+        });
 
         // Удаление всех быстрых сообщений
         function clearResponse() {
