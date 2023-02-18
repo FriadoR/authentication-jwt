@@ -1,2 +1,2 @@
-Authorization with JWT token / API / PHP / MySQL / jQuery  
+Authorization with JWT token / API / PHP / MySQL / jQuery    
 _________________________________________________________
